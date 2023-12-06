@@ -10,45 +10,45 @@ def PRF_matrix(G, t):
     A = A.toarray()
 
     degrees = dict(nx.degree(G)).values()
-    deegreelist = list()
+    probabilitylist = list()
     for d in degrees:
-        deegreelist.append(1 / d)
+        probabilitylist.append(1 / d)
 
-    D = np.diag(deegreelist)
-    S = np.matmul(D, A)
+    P = np.diag(probabilitylist)
+    R = np.matmul(P,A)
+    T = np.transpose(R)
 
-    PRF = S
+    PRF = T
     for i in range(2, t+1):
-        PRF = np.matmul(S, PRF)
+        PRF = np.matmul(T, PRF)
     return PRF
 
 def PRD_matrix(G, t):   # kiszámítja a távolság mátrixot
     n = nx.number_of_nodes(G)
     PRF = PRF_matrix(G, t)
     PRD = np.zeros((n, n))
+    pp = set()
 
-    pp = np.empty(n, int)
     for i in range(0, n):
-        p = np.array(PRF[i,:])
+        p = np.array(PRF[:,i])
         max_rwf = np.max(p)
         for j in range(0, n):
-            if PRF[i,j] == max_rwf:
-                pp[i] = j
-    pp = np.unique(pp)
+            if PRF[j,i] == max_rwf:
+                pp.add(j)
 
     for i in range(0, n):
         for j in range(0, n):
             summ = 0
             for k in pp:
-                diff = (PRF[i,k] - PRF[j,k]) * (PRF[i,k] - PRF[j,k])
+                diff = (PRF[k,i] - PRF[k,j]) * (PRF[k,i] - PRF[k,j])
                 summ = summ + diff
-            PRD[i,j] = math.sqrt(summ)
+            PRD[j,i] = math.sqrt(summ)
     return PRD
 
 def main():
     np.set_printoptions(threshold=np.inf)
-    #G = nx.karate_club_graph()
-    G = nx.les_miserables_graph()
+    G = nx.karate_club_graph()
+    #G = nx.les_miserables_graph()
 
     distance_matrix = PRD_matrix(G, 6)
 
