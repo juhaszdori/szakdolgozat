@@ -3,7 +3,6 @@ import numpy as np
 import math
 import statistics
 
-
 def PRF_matrix(G, t):
     A = nx.adjacency_matrix(G, None, None, None)
     A = A.toarray()
@@ -22,8 +21,8 @@ def PRF_matrix(G, t):
         PRF = np.matmul(T, PRF)
     return PRF
 
-
-def PRD_matrix(G, t):   # kiszámítja a távolság mátrixot
+# kiszámítja a távolság mátrixot
+def PRD_matrix(G, t):
     n = nx.number_of_nodes(G)
     PRF = PRF_matrix(G, t)
     PRD = np.zeros((n, n))
@@ -45,8 +44,8 @@ def PRD_matrix(G, t):   # kiszámítja a távolság mátrixot
             PRD[j,i] = math.sqrt(summ)
     return PRD
 
-
-def calculate_threshold(PRD, tour): # küszöbérték kiszámtása, meddig darabolunk
+# küszöbérték kiszámítása, meddig daraboljuk az utat
+def calculate_threshold(PRD, tour):
     tour_length = len(tour)
     D = list()
 
@@ -60,8 +59,8 @@ def calculate_threshold(PRD, tour): # küszöbérték kiszámtása, meddig darab
 
     return delta
 
-
-def split_path(PRD, tour):   # a kapott útvonalat darabolja fel közösségekre
+# a kapott útvonalat darabolja fel közösségekre
+def split_path(PRD, tour):
     tour_length = len(tour)
     cutting_pos = list()
     membership = dict()
@@ -79,13 +78,3 @@ def split_path(PRD, tour):   # a kapott útvonalat darabolja fel közösségekre
     membership[tour[tour_length-1]] = community
 
     return membership, len(cutting_pos)
-
-
-def print_community_file(membership, cuts):
-    with open("community.dat", "w") as f:
-        for n, c in membership.items():
-            if c > cuts:
-                f.write(str(n) + "\t" + "1" + "\n")
-            else:
-                f.write(str(n) + "\t" + str(c) + "\n")
-    print("közösségek száma: " + str(cuts))

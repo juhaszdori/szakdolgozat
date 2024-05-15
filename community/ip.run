@@ -1,0 +1,9 @@
+reset;
+model ip.mod;
+data ../data/karate_ip.dat;
+option solver gurobi;
+option relax_integrality 0;
+solve;
+option display_width 500;
+display modularitas > ../data/karate_x.dat;
+display x > ../data/karate_x.dat;
