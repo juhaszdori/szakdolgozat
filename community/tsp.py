@@ -76,5 +76,7 @@ def split_path(PRD, tour):
     if PRD[tour[tour_length-1],tour[0]] > delta:
         cutting_pos.append(tour[tour_length-1])
     membership[tour[tour_length-1]] = community
+    print(membership)
+    print(tour)
 
     return membership, len(cutting_pos)
