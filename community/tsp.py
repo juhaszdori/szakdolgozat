@@ -42,6 +42,7 @@ def PRD_matrix(G, t):
                 diff = (PRF[k,i] - PRF[k,j]) * (PRF[k,i] - PRF[k,j])
                 summ = summ + diff
             PRD[j,i] = math.sqrt(summ)
+
     return PRD
 
 # küszöbérték kiszámítása, meddig daraboljuk az utat
@@ -57,6 +58,9 @@ def calculate_threshold(PRD, tour):
     szigma = statistics.stdev(D, mu)
     delta = mu + szigma
 
+    #print("delta")
+    #print(delta)
+
     return delta
 
 # a kapott útvonalat darabolja fel közösségekre
@@ -70,13 +74,25 @@ def split_path(PRD, tour):
 
     for i in range(tour_length-1):
         membership[tour[i]] = community
-        if PRD[tour[i],tour[i+1] ] > delta:
+        if PRD[tour[i], tour[i+1]] > delta:
+            #print("prd")
+            #print(PRD[tour[i], tour[i+1]])
             cutting_pos.append(tour[i])
             community = community+1
+
+    membership[tour[tour_length - 1]] = community
     if PRD[tour[tour_length-1],tour[0]] > delta:
         cutting_pos.append(tour[tour_length-1])
-    membership[tour[tour_length-1]] = community
-    print(membership)
-    print(tour)
+    else:
+        for node, c in membership.items():
+            if c == community:
+                membership[node] = 1
+
+    #print("cutting_pos")
+    #print(cutting_pos)
+    #print("membership")
+    #print(membership)
+    #print("tour")
+    #print(tour)
 
     return membership, len(cutting_pos)

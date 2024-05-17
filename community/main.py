@@ -1,63 +1,31 @@
 import networkx as nx
 import numpy as np
-from python_tsp.heuristics import solve_tsp_simulated_annealing, solve_tsp_local_search, solve_tsp_lin_kernighan
+from python_tsp.heuristics import solve_tsp_simulated_annealing, solve_tsp_local_search
 import tsp
 import nmi
 import convert
 from timeit import default_timer as timer
 
 def karate():
-    #Zachary's karate club
-    # IP data
     karate = nx.read_gml("karate.gml", label='id', destringizer=int)
     convert.create_edgelist(karate, "karate_edge_list.dat")
     convert.get_degree_sequence(karate, "karate_degree_sequence.dat")
-
-    # alapigazság kozosseg
     convert.karate_club("karate.dat")
 
-    # IP test
-    convert.get_ip_communities("karate_x.dat", "karate_ip_communities.dat")
-
-    # tsp tests
-    print("Szimulált hűtés")
-    start = timer()
-    distance_matrix = tsp.PRD_matrix(karate, 6)
-    tour, distance = solve_tsp_lin_kernighan(distance_matrix)
-    membership, cuts = tsp.split_path(distance_matrix, tour)
-    end = timer()
-    print(end - start)
-    convert.get_tsp_communities(membership, cuts, "karate_tsp_communities.dat")
-
-    # nmi values
-    print("nmi")
-    print(nmi.get_nmi_value("karate_ground_truth.dat", "karate_ip_communities.dat"))
-    print(nmi.get_nmi_value("karate_ground_truth.dat", "karate_tsp_communities.dat"))
-
 def polbooks():
-    # Books about U.S. politics
     polbooks = nx.read_gml("polbooks.gml", label='id', destringizer=int)
     convert.create_edgelist(polbooks, "polbooks_edge_list_0.dat")
     convert.reindex_edgelist("polbooks_edge_list_0.dat", "polbooks_edge_list.dat")
     convert.get_degree_sequence(polbooks, "polbooks_degree_sequence.dat")
     convert.get_communities_from_gml_value_polbooks(polbooks, "polbooks_ground_truth.dat")
 
-def football():
-    # College Football
-    football = nx.read_gml("football.gml", label='id', destringizer=int)
-    convert.create_edgelist(football, "football_edge_list_0.dat")
-    convert.reindex_edgelist("football_edge_list_0.dat", "football_edge_list.dat")
-    convert.get_degree_sequence(football, "football_degree_sequence.dat")
-
 def dolphins():
-    # Dolphin social network
     dolphins = nx.read_gml("dolphins.gml", label='id', destringizer=int)
     convert.create_edgelist(dolphins, "dolphins_edge_list_0.dat")
     convert.reindex_edgelist("dolphins_edge_list_0.dat", "dolphins_edge_list.dat")
     convert.get_degree_sequence(dolphins, "dolphins_degree_sequence.dat")
 
 def football():
-    # College Football
     football = nx.read_gml("football.gml", label='id', destringizer=int)
     convert.create_edgelist(football, "football_edge_list_0.dat")
     convert.reindex_edgelist("football_edge_list_0.dat", "football_edge_list.dat")
@@ -65,21 +33,10 @@ def football():
     convert.get_communities_from_gml_value_football(football, "football_ground_truth.dat")
 
 def lesmis():
-    # Les Miserables
     lesmis = nx.read_gml("lesmis.gml", label='id', destringizer=int)
     convert.create_edgelist(lesmis, "lesmis_edge_list_0.dat")
     convert.reindex_edgelist("lesmis_edge_list_0.dat", "lesmis_edge_list.dat")
     convert.get_degree_sequence(lesmis, "lesmis_degree_sequence.dat")
-
-def generated():
-    # generált
-    network2 = convert.create_graph_from_generated_edgelist("network2.dat")
-    convert.create_edgelist(network2, "network2_edge_list.dat")
-    convert.get_degree_sequence(network2, "network2_degree_sequence.dat")
-
-    network3 = convert.create_graph_from_generated_edgelist("network3.dat")
-    convert.create_edgelist(network3, "network3_edge_list.dat")
-    convert.get_degree_sequence(network3, "network3_degree_sequence.dat")
 
 def get_ip_nmi_values():
     network4 = convert.create_graph_from_generated_edgelist("network4.dat")
@@ -103,23 +60,151 @@ def get_ip_nmi_values():
     convert.get_ip_communities("football_x.dat", "football_ip_communities.dat")
     print(nmi.get_nmi_value("football_ground_truth.dat", "football_ip_communities.dat"))
 
-def get_tsp_results():
-    convert.get_tsp_communities(membership, cuts, "karate_tsp_communities.dat")
-    print(nmi.get_nmi_value("karate_ground_truth.dat", "karate_tsp_communities.dat"))
+def get_tsp_results_karate():
+    karate = nx.read_gml("karate.gml", label='id', destringizer=int)
+
+    print("Szimulált hűtés")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(karate, 6)
+    tour, distance = solve_tsp_simulated_annealing(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "karate_tsp_communities_sa.dat")
+
+    print("nmi")
+    print(nmi.get_nmi_value("karate_ground_truth.dat", "karate_tsp_communities_sa.dat"))
+
+    print("Lokális kereső")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(karate, 6)
+    tour, distance = solve_tsp_local_search(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "karate_tsp_communities_ls.dat")
+
+    print("nmi")
+    print(nmi.get_nmi_value("karate_ground_truth.dat", "karate_tsp_communities_ls.dat"))
+
+def get_tsp_results_polbooks():
+    polbooks = nx.read_gml("polbooks.gml", label='id', destringizer=int)
+
+    print("Szimulált hűtés")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(polbooks, 6)
+    tour, distance = solve_tsp_simulated_annealing(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "polbooks_tsp_communities_sa.dat")
+
+    print("nmi")
+    print(nmi.get_nmi_value("polbooks_ground_truth.dat", "polbooks_tsp_communities_sa.dat"))
+
+    print("Lokális kereső")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(polbooks, 6)
+    tour, distance = solve_tsp_local_search(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "polbooks_tsp_communities_ls.dat")
+
+    print("nmi")
+    print(nmi.get_nmi_value("polbooks_ground_truth.dat", "polbooks_tsp_communities_ls.dat"))
+
+def get_tsp_results_football():
+    football = nx.read_gml("football.gml", label='id', destringizer=int)
+
+    print("Szimulált hűtés")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(football, 6)
+    tour, distance = solve_tsp_simulated_annealing(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "football_tsp_communities_sa.dat")
+
+    print("nmi")
+    print(nmi.get_nmi_value("football_ground_truth.dat", "football_tsp_communities_sa.dat"))
+
+    print("Lokális kereső")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(football, 6)
+    tour, distance = solve_tsp_local_search(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "football_tsp_communities_ls.dat")
+
+    print("nmi")
+    print(nmi.get_nmi_value("football_ground_truth.dat", "football_tsp_communities_ls.dat"))
+
+def get_tsp_results_dolphins():
+    dolphins = nx.read_gml("dolphins.gml", label='id', destringizer=int)
+
+    print("Szimulált hűtés")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(dolphins, 6)
+    tour, distance = solve_tsp_simulated_annealing(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "dolphins_tsp_communities_sa.dat")
+
+    print("Lokális kereső")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(dolphins, 6)
+    tour, distance = solve_tsp_local_search(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "dolphins_tsp_communities_ls.dat")
+
+def get_tsp_results_lesmis():
+    lesmis = nx.read_gml("lesmis.gml", label='id', destringizer=int)
+
+    print("Szimulált hűtés")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(lesmis, 6)
+    tour, distance = solve_tsp_simulated_annealing(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "lesmis_tsp_communities_sa.dat")
+
+    print("Lokális kereső")
+    start = timer()
+    distance_matrix = tsp.PRD_matrix(lesmis, 6)
+    tour, distance = solve_tsp_local_search(distance_matrix)
+    membership, cuts = tsp.split_path(distance_matrix, tour)
+    end = timer()
+    print("idő")
+    print(end - start)
+    convert.get_tsp_communities(membership, cuts, "lesmis_tsp_communities_ls.dat")
+
+
+def generated():
+    network2 = convert.create_graph_from_generated_edgelist("network2.dat")
+    convert.create_edgelist(network2, "network2_edge_list.dat")
+    convert.get_degree_sequence(network2, "network2_degree_sequence.dat")
+
+    network3 = convert.create_graph_from_generated_edgelist("network3.dat")
+    convert.create_edgelist(network3, "network3_edge_list.dat")
+    convert.get_degree_sequence(network3, "network3_degree_sequence.dat")
 
 def main():
     np.set_printoptions(threshold=np.inf)
-
-
-
-
-
-
-
-
-
-
-
 
 
 
