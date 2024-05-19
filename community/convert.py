@@ -33,16 +33,19 @@ def get_degree_sequence(G, degree_sequence):
             f.write(str(i+1) + "\t" + str(sum(A[i])) + "\n")
 
 # visszaad egy gráfot a generált hálózat éllistájából
-def create_graph_from_generated_edgelist(edgelist_file):
-    edgelist = []
-    with open(edgelist_file, "r") as f:
+def create_graph_from_generated_edgelist(generated_file):
+    edgelist = list()
+    with open(generated_file, "r") as f:
         for line in f:
             edge = line.split()
-            if edge[0] < edge[1]:
-                edgetuple = (edge[0], edge[1])
+            if int(edge[0]) < int(edge[1]):
+                edgetuple = (int(edge[0]), int(edge[1]))
                 edgelist.append(edgetuple)
 
-    G = nx.from_edgelist(edgelist)
+    G = nx.empty_graph(100)
+    for u in edgelist:
+        G.add_edge(u[0]-1, u[1]-1)
+
     return G
 
 # kiírja egy data fájlba a polbooks hálózat közösségszerkezetét a gráf value attribútumából
@@ -63,31 +66,7 @@ def get_communities_from_gml_value_football(G, communities):
     community = nx.get_node_attributes(G, "value")
     with open(communities, "w") as f:
         for n, c in community.items():
-            if c == "Atlantic Coast":
-                c = 1
-            elif c == "Big East":
-                c = 2
-            elif c == "Big Ten":
-                c = 3
-            elif c == "Big Twelve":
-                c = 4
-            elif c == "Conference USA":
-                c = 5
-            elif c == "Independents":
-                c = 6
-            elif c == "Mid-American":
-                c = 7
-            elif c == "Mountain West":
-                c = 8
-            elif c == "Pacific Ten":
-                c = 9
-            elif c == "Southeastern":
-                c = 10
-            elif c == "Sun Belt":
-                c = 11
-            elif c == "Western Athletic":
-                c = 12
-            f.write(str(n+1) + "\t" + str(c) + "\n")
+            f.write(str(n+1) + "\t" + str(c+1) + "\n")
 
 # 1-től kezdi a csúcsok indexelését
 def create_(data_file, data_file2):
@@ -115,10 +94,7 @@ def get_tsp_communities(membership, cuts, file):
     membership = dict(sorted(membership.items()))
     with open(file, "w") as f:
         for n, c in membership.items():
-            if c > cuts:
-                f.write(str(n+1) + "\t" + "1" + "\n")
-            else:
-                f.write(str(n+1) + "\t" + str(c) + "\n")
+            f.write(str(n+1) + "\t" + str(c) + "\n")
     print("közösségek száma: " + str(cuts))
 
 # kiírja egy data fájlba az ip által visszaadott közösségszerkezetet
@@ -133,10 +109,9 @@ def get_ip_communities(matrix, communities):
             if i == ':' or i == ':=':
                 leftover_numbers.remove(i)
         leftover = [eval(i) for i in leftover_numbers]
-        list.append((1, c))
         for line in f:
             xij = line.split()
-            if int(xij[0]) not in leftover:
+            if int(int(xij[0])) != 1 and int(xij[0]) not in leftover:
                 continue
             list.append((int(xij[0]), c))
             for j in range(1, len(xij)):

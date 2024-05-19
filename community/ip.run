@@ -1,10 +1,10 @@
 reset;
 model ip.mod;
-data ../data/network3_ip.dat;
+data ../data/network2_ip.dat;
 option solver gurobi;
 option relax_integrality 0;
 solve;
 option display_width 500;
 display _ampl_elapsed_time + _solve_elapsed_time;
 display modularitas;
-display x > ../data/network3_x.dat;
+display x > ../data/network2_x.dat;
