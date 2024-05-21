@@ -339,5 +339,43 @@ def get_ip_nmi_values_generated():
 def main():
     np.set_printoptions(threshold=np.inf)
 
+    karate = nx.read_gml("karate.gml", label='id', destringizer=int)
+
+    with open("karate_ip_communities.dat", "r") as community_file:
+        communities = dict()
+        for line in community_file:
+            node_community = line.split()
+            node = int(node_community[0])
+            community = int(node_community[1])
+
+            communities[node] = community
+
+    nx.set_node_attributes(karate, communities, "community")
+    nx.write_gml(karate, "karate_ip_c.gml")
+
+    with open("karate_tsp_communities_sa.dat", "r") as community_file:
+        communities = dict()
+        for line in community_file:
+            node_community = line.split()
+            node = int(node_community[0])
+            community = int(node_community[1])
+
+            communities[node] = community
+
+    nx.set_node_attributes(karate, communities, "community")
+    nx.write_gml(karate, "karate_tsp_sa_c.gml")
+
+    with open("karate_ground_truth.dat", "r") as community_file:
+        communities = dict()
+        for line in community_file:
+            node_community = line.split()
+            node = int(node_community[0])
+            community = int(node_community[1])
+
+            communities[node] = community
+
+    nx.set_node_attributes(karate, communities, "community")
+    nx.write_gml(karate, "karate_ground_truth_c.gml")
+
 if __name__ == '__main__':
     main()
